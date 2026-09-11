@@ -7,7 +7,15 @@ from app.database.connection import engine
 from app.models import User, Organization, Campaign, Zone, Observation
 from app.core.security import hash_password
 from app.database.connection import SessionLocal
-from app.routes import auth, organizations, campaigns, zones, observations, dashboard
+from app.routes import (
+    auth,
+    organizations,
+    institutions,
+    campaigns,
+    zones,
+    observations,
+    dashboard,
+)
 
 Base.metadata.create_all(bind=engine)
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
@@ -25,6 +33,11 @@ app=FastAPI(title=settings.APP_NAME, version='1.0.0')
 app.add_middleware(CORSMiddleware, allow_origins=settings.CORS_ORIGINS, allow_credentials=True, allow_methods=['*'], allow_headers=['*'])
 app.include_router(auth.router,prefix='/auth',tags=['Auth'])
 app.include_router(organizations.router,prefix='/organizations',tags=['Organizations'])
+app.include_router(
+    institutions.router,
+    prefix="/institutions",
+    tags=["Institutions"],
+)
 app.include_router(campaigns.router,prefix='/campaigns',tags=['Campaigns'])
 app.include_router(zones.router,prefix='/zones',tags=['Zones'])
 app.include_router(observations.router,prefix='/observations',tags=['Observations'])

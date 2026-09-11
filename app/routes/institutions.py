@@ -3,15 +3,14 @@ from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
 from app.models import Organization
-from app.repositories.organization_repository import OrganizationRepository
-from app.schemas.schemas import OrganizationCreate, OrganizationOut
 from app.routes.deps import current_user, admin_user
+from app.schemas.schemas import OrganizationCreate, OrganizationOut
 
 router = APIRouter()
 
 
 @router.post("", response_model=OrganizationOut)
-def create(
+def create_institution(
     data: OrganizationCreate,
     db: Session = Depends(get_db),
     user=Depends(current_user),
@@ -28,35 +27,47 @@ def create(
             detail="You already have an institution",
         )
 
-    return OrganizationRepository(db).create(
-        **data.model_dump(),
+    institution = Organization(
+        name=data.name,
+        organization_type=data.organization_type,
+        location=data.location,
         owner_id=user.id,
     )
 
+    db.add(institution)
+    db.commit()
+    db.refresh(institution)
+
+    return institution
+
 
 @router.get("/me", response_model=OrganizationOut)
-def me(
+def my_institution(
     db: Session = Depends(get_db),
     user=Depends(current_user),
 ):
-    organization = (
+    institution = (
         db.query(Organization)
         .filter(Organization.owner_id == user.id)
         .first()
     )
 
-    if not organization:
+    if not institution:
         raise HTTPException(
             status_code=404,
             detail="Institution not found",
         )
 
-    return organization
+    return institution
 
 
 @router.get("", response_model=list[OrganizationOut])
-def all(
+def all_institutions(
     db: Session = Depends(get_db),
     user=Depends(admin_user),
 ):
-    return OrganizationRepository(db).all()
+    return (
+        db.query(Organization)
+        .order_by(Organization.created_at.desc())
+        .all()
+    )

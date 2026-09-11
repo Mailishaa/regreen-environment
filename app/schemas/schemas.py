@@ -43,4 +43,14 @@ class ZoneOut(ZoneCreate):
 
 class ObservationOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int; zone_id: int; observation_type: str; tree_count: int; latitude: float; longitude: float; image_path: str | None; verified: bool; captured_at: datetime
+
+    id: int
+    zone_id: int
+    observation_type: str
+    tree_count: int
+    latitude: float
+    longitude: float
+    image_path: str | None
+    verified: bool
+    captured_at: datetime
+    created_at: datetime
