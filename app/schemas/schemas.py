@@ -10,7 +10,7 @@ class LoginRequest(BaseModel):
     password: str
 
 class UserCreate(BaseModel):
-    email: EmailStr
+    email: str
     password: str
     full_name: str
 
@@ -18,7 +18,7 @@ class UserCreate(BaseModel):
 
 class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int; email: EmailStr; full_name: str; role: str
+    id: int; email: str; full_name: str; role: str
 
 class OrganizationCreate(BaseModel):
     name: str; organization_type: str; location: str
